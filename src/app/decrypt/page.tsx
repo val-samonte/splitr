@@ -30,6 +30,9 @@ export default function DecryptPage() {
       })
   }, [permission, setPermission, setErrorMsg])
 
+  // const recovered = combine(shares)
+  // console.log(recovered.toString() === result.salt + '.' + result.ciphertext)
+
   return (
     <form
       className='flex flex-col flex-auto p-5 gap-3 h-full'
@@ -87,7 +90,7 @@ export default function DecryptPage() {
         type='submit'
         className='bg-purple-800 hover:bg-purple-600 rounded-md px-3 py-2 mt-2'
       >
-        Decrypt to Clipboard
+        Decrypt & copy to clipboard
       </button>
     </form>
   )
