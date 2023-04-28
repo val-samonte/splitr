@@ -1,11 +1,15 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { FormEvent, useCallback, useEffect, useState } from 'react'
 import { QrReader } from 'react-qr-reader'
+import bs58 from 'bs58'
+import { combine } from 'shamirs-secret-sharing-ts'
+import { decrypt } from '../crypto'
 
 export default function DecryptPage() {
   const [scans, setScans] = useState<string[]>([])
   const [errorMsg, setErrorMsg] = useState('')
+  const [password, setPassword] = useState('')
   const [permission, setPermission] = useState<PermissionState | ''>('')
 
   useEffect(() => {
@@ -23,18 +27,30 @@ export default function DecryptPage() {
       .getUserMedia({ video: true })
       .catch((error) => {
         console.error('Failed to get camera access:', error)
-        setErrorMsg(error + '')
+        setErrorMsg(error.message)
       })
       .finally(() => {
         setPermission('')
       })
   }, [permission, setPermission, setErrorMsg])
 
-  // const recovered = combine(shares)
-  // console.log(recovered.toString() === result.salt + '.' + result.ciphertext)
+  const onDecrypt = async (e: FormEvent) => {
+    // QR Codes
+    const shares = scans.map((s) => bs58.decode(s))
+
+    // Shamir's Secret Sharing
+    const recovered = combine(shares)
+
+    // AES-GCM
+    const [salt, ciphertext] = recovered.toString().split('.')
+    const data = await decrypt(salt, password, ciphertext)
+
+    navigator.clipboard.writeText(data)
+  }
 
   return (
     <form
+      onSubmit={onDecrypt}
       className='flex flex-col flex-auto p-5 gap-3 h-full'
       autoComplete='off'
     >
@@ -48,23 +64,37 @@ export default function DecryptPage() {
             videoContainerStyle={{ width: '100%' }}
             videoStyle={{ width: '100%' }}
             containerStyle={{ width: '100%' }}
-            className='w-full aspect-square bg-black/20 overflow-hidden rounded'
+            className='w-full aspect-square bg-neutral-950/50 overflow-hidden rounded'
             constraints={{ facingMode: 'environment' }}
             onResult={async (result, error) => {
               if (!!result) {
                 const code = result?.getText()
-                setScans((codes) => [...codes, code])
+
+                setScans((codes) => {
+                  if (codes.includes(code)) return codes
+                  return [...codes, code]
+                })
               }
 
               if (error?.message) {
                 console.log(JSON.stringify(error))
-                // setErrorMsg(error.message)
                 setErrorMsg(error.message)
               }
             }}
           />
+          {scans.length > 0 && (
+            <div className='absolute inset-x-0 bottom-0 flex items-center justify-center p-3'>
+              <button
+                type='button'
+                className='px-3 py-2 mt-2 text-xs uppercase rounded-md'
+                onClick={() => setScans([])}
+              >
+                Tap to start over
+              </button>
+            </div>
+          )}
           {errorMsg && (
-            <div className='absolute inset-x-2 bottom-2 bg-red-800/10 text-xs text-red-600 p-3 rounded'>
+            <div className='pointer-events-none absolute inset-x-2 bottom-2 bg-red-800/90 text-xs text-white p-3 rounded'>
               {errorMsg}
             </div>
           )}
@@ -80,6 +110,8 @@ export default function DecryptPage() {
         </label>
         <input
           placeholder='Can be blank'
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           autoComplete='false'
           type='password'
           id='password'
