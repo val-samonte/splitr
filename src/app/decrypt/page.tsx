@@ -74,6 +74,8 @@ export default function DecryptPage() {
                   if (codes.includes(code)) return codes
                   return [...codes, code]
                 })
+
+                setErrorMsg('')
               }
 
               if (error?.message) {
