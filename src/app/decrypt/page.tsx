@@ -6,29 +6,29 @@ import { QrReader } from 'react-qr-reader'
 export default function DecryptPage() {
   const [scans, setScans] = useState<string[]>([])
   const [errorMsg, setErrorMsg] = useState('')
-  const [permissionState, setPermissionState] = useState('') // useState('')
+  const [permission, setPermission] = useState<PermissionState | ''>('')
 
   useEffect(() => {
-    if (permissionState !== '') return
+    if (permission !== '') return
     navigator.permissions
       .query({ name: 'camera' as PermissionName })
       .then((result) => {
-        console.log(result)
-        setPermissionState(result.state)
+        setPermission(result.state)
       })
-  }, [permissionState, setPermissionState])
+  }, [permission, setPermission])
 
   const requestAccess = useCallback(() => {
+    if (permission === 'granted') return
     navigator.mediaDevices
       .getUserMedia({ video: true })
       .catch((error) => {
         console.error('Failed to get camera access:', error)
-        setErrorMsg(JSON.stringify(error))
+        setErrorMsg(error + '')
       })
       .finally(() => {
-        setPermissionState('')
+        setPermission('')
       })
-  }, [setPermissionState, setErrorMsg])
+  }, [permission, setPermission, setErrorMsg])
 
   return (
     <form
@@ -37,7 +37,7 @@ export default function DecryptPage() {
     >
       <div className='flex flex-col flex-none gap-2'>
         <label className='text-sm text-neutral-500 uppercase flex-none flex justify-between'>
-          <span>Scan {permissionState}</span>
+          <span>Scan {permission}</span>
           <span>{scans.length} items scanned</span>
         </label>
         <div className='relative' onClick={() => requestAccess()}>
@@ -76,6 +76,7 @@ export default function DecryptPage() {
           Password
         </label>
         <input
+          placeholder='Can be blank'
           autoComplete='false'
           type='password'
           id='password'

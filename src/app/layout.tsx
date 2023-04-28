@@ -3,8 +3,9 @@ import Tabs from './Tabs'
 import './globals.css'
 
 export const metadata = {
-  title: 'AES-SSS-QRCODE',
-  description: 'Split any data. Password secured.',
+  title: 'Splitr',
+  description:
+    "Data encryption tool using AES-GCM, splitting it with Shamir's secret sharing and output them as QR CodesSplit any data. Password secured.",
 }
 
 export default function RootLayout({
@@ -24,13 +25,14 @@ export default function RootLayout({
                 {children}
               </div>
             </div>
-            <div className='flex flex-col gap-3 mt-3 max-w-xs mx-auto text-neutral-500 text-center'>
+            <div className='flex flex-col gap-3 mt-3 max-w-sm mx-auto text-neutral-500 text-center'>
               <p className='uppercase text-sm'>
                 <span className='font-bold '>Disclaimer</span>
               </p>
               <p className='uppercase text-xs'>
                 By using this tool (website), you agree that the developer is
-                not responsible for any loss or damages that may happen to you
+                not responsible for any loss or damages that may occur to you.
+                Use at your own risk!
               </p>
               <p className='flex gap-5 underline mx-auto text-sm'>
                 <a

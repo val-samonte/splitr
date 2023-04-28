@@ -10,7 +10,7 @@ export default function PhishingWarning() {
         className='bg-yellow-400 text-black h-6 font-bold w-full uppercase text-center cursor-pointer'
         onClick={() => setShowModal(true)}
       >
-        Be careful from <span className='underline'>phishing attack</span>
+        Be careful of <span className='underline'>phishing attack</span>
       </div>
       {showModal && (
         <div className='fixed inset-0 z-10 bg-black/80 flex flex-col items-center justify-center'>
@@ -55,7 +55,8 @@ export default function PhishingWarning() {
                 </p>
                 <p className='text-center uppercase'>
                   By using this tool (website), you agree that the developer is
-                  not responsible for any loss or damages that may happen to you
+                  not responsible for any loss or damages that may occur to you.
+                  Use at your own risk!
                 </p>
                 <button
                   onClick={() => setShowModal(false)}
