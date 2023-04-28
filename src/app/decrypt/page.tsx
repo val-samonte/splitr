@@ -40,23 +40,35 @@ export default function DecryptPage() {
   const onDecrypt = async (e: FormEvent) => {
     e.preventDefault()
 
+    let shares: Uint8Array[]
+    let recovered: Uint8Array
+    let data: string
+
     try {
       // QR Codes
-      const shares = scans.map((s) => bs58.decode(s))
-
-      // Shamir's Secret Sharing
-      const recovered = combine(shares)
-
-      // AES-GCM
-      const [salt, ciphertext] = recovered.toString().split('.')
-      const data = await decrypt(salt, password, ciphertext)
-
-      navigator.clipboard.writeText(data)
-      setHasError('')
+      shares = scans.map((s) => bs58.decode(s))
     } catch (e: any) {
-      setHasError(e.message)
+      setHasError('QR Code: ' + e.message)
     }
 
+    try {
+      // Shamir's Secret Sharing
+      recovered = combine(shares!)
+    } catch (e: any) {
+      setHasError('SSS: ' + e.message)
+    }
+
+    try {
+      // AES-GCM
+      const [salt, ciphertext] = recovered!.toString().split('.')
+      data = await decrypt(salt, password, ciphertext)
+    } catch (e: any) {
+      setHasError('AES-GCM: ' + e.message)
+    }
+
+    await navigator.clipboard.writeText(data!)
+
+    setHasError('')
     setShowResultModal(true)
   }
 
