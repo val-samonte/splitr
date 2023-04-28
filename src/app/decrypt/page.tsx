@@ -35,6 +35,8 @@ export default function DecryptPage() {
   }, [permission, setPermission, setErrorMsg])
 
   const onDecrypt = async (e: FormEvent) => {
+    e.preventDefault()
+
     // QR Codes
     const shares = scans.map((s) => bs58.decode(s))
 
