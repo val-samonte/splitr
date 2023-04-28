@@ -5,12 +5,15 @@ import { QrReader } from 'react-qr-reader'
 import bs58 from 'bs58'
 import { combine } from 'shamirs-secret-sharing-ts'
 import { decrypt } from '../crypto'
+import CloseIcon from '../CloseIcon'
 
 export default function DecryptPage() {
   const [scans, setScans] = useState<string[]>([])
   const [errorMsg, setErrorMsg] = useState('')
   const [password, setPassword] = useState('')
   const [permission, setPermission] = useState<PermissionState | ''>('')
+  const [showResultModal, setShowResultModal] = useState(false)
+  const [hasError, setHasError] = useState('')
 
   useEffect(() => {
     if (permission !== '') return
@@ -37,97 +40,135 @@ export default function DecryptPage() {
   const onDecrypt = async (e: FormEvent) => {
     e.preventDefault()
 
-    // QR Codes
-    const shares = scans.map((s) => bs58.decode(s))
+    try {
+      // QR Codes
+      const shares = scans.map((s) => bs58.decode(s))
 
-    // Shamir's Secret Sharing
-    const recovered = combine(shares)
+      // Shamir's Secret Sharing
+      const recovered = combine(shares)
 
-    // AES-GCM
-    const [salt, ciphertext] = recovered.toString().split('.')
-    const data = await decrypt(salt, password, ciphertext)
+      // AES-GCM
+      const [salt, ciphertext] = recovered.toString().split('.')
+      const data = await decrypt(salt, password, ciphertext)
 
-    navigator.clipboard.writeText(data)
+      navigator.clipboard.writeText(data)
+      setHasError('')
+    } catch (e: any) {
+      setHasError(e.message)
+    }
+
+    setShowResultModal(true)
   }
 
   return (
-    <form
-      onSubmit={onDecrypt}
-      className='flex flex-col flex-auto p-5 gap-3 h-full'
-      autoComplete='off'
-    >
-      <div className='flex flex-col flex-none gap-2'>
-        <label className='text-sm text-neutral-500 uppercase flex-none flex justify-between'>
-          <span>Scan {permission}</span>
-          <span>{scans.length} items scanned</span>
-        </label>
-        <div className='relative' onClick={() => requestAccess()}>
-          <QrReader
-            videoContainerStyle={{ width: '100%' }}
-            videoStyle={{ width: '100%' }}
-            containerStyle={{ width: '100%' }}
-            className='w-full aspect-square bg-neutral-950/50 overflow-hidden rounded'
-            constraints={{ facingMode: 'environment' }}
-            onResult={async (result, error) => {
-              if (!!result) {
-                const code = result?.getText()
-
-                setScans((codes) => {
-                  if (codes.includes(code)) return codes
-                  return [...codes, code]
-                })
-
-                setErrorMsg('')
-              }
-
-              if (error?.message) {
-                console.log(JSON.stringify(error))
-                setErrorMsg(error.message)
-              }
-            }}
-          />
-          {scans.length > 0 && (
-            <div className='absolute inset-x-0 bottom-0 flex items-center justify-center p-3'>
-              <button
-                type='button'
-                className='px-3 py-2 mt-2 text-xs uppercase rounded-md'
-                onClick={() => setScans([])}
-              >
-                Tap to start over
-              </button>
-            </div>
-          )}
-          {errorMsg && (
-            <div className='pointer-events-none absolute inset-x-2 bottom-2 bg-red-800/90 text-xs text-white p-3 rounded'>
-              {errorMsg}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className='flex flex-col flex-none gap-2'>
-        <label
-          htmlFor='password'
-          className='text-sm text-neutral-500 uppercase flex-none'
-        >
-          Password
-        </label>
-        <input
-          placeholder='Can be blank'
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete='false'
-          type='password'
-          id='password'
-          className='bg-neutral-950/50 rounded-md w-full px-3 py-2'
-        />
-      </div>
-      <button
-        type='submit'
-        className='bg-purple-800 hover:bg-purple-600 rounded-md px-3 py-2 mt-2'
+    <>
+      <form
+        onSubmit={onDecrypt}
+        className='flex flex-col flex-auto p-5 gap-3 h-full'
+        autoComplete='off'
       >
-        Decrypt & copy to clipboard
-      </button>
-    </form>
+        <div className='flex flex-col flex-none gap-2'>
+          <label className='text-sm text-neutral-500 uppercase flex-none flex justify-between'>
+            <span>Scan {permission}</span>
+            <span>{scans.length} items scanned</span>
+          </label>
+          <div className='relative' onClick={() => requestAccess()}>
+            <QrReader
+              videoContainerStyle={{ width: '100%' }}
+              videoStyle={{ width: '100%' }}
+              containerStyle={{ width: '100%' }}
+              className='w-full aspect-square bg-neutral-950/50 overflow-hidden rounded'
+              constraints={{ facingMode: 'environment' }}
+              onResult={async (result, error) => {
+                if (!!result) {
+                  const code = result?.getText()
+
+                  setScans((codes) => {
+                    if (codes.includes(code)) return codes
+                    return [...codes, code]
+                  })
+
+                  setErrorMsg('')
+                }
+
+                if (error?.message) {
+                  console.log(JSON.stringify(error))
+                  setErrorMsg(error.message)
+                }
+              }}
+            />
+            {scans.length > 0 && (
+              <div className='absolute inset-x-0 bottom-0 flex items-center justify-center p-3'>
+                <button
+                  type='button'
+                  className='px-3 py-2 mt-2 text-xs uppercase rounded-md'
+                  onClick={() => setScans([])}
+                >
+                  Tap to start over
+                </button>
+              </div>
+            )}
+            {errorMsg && (
+              <div className='pointer-events-none absolute inset-x-2 bottom-2 bg-red-800/90 text-xs text-white p-3 rounded-md'>
+                {errorMsg}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className='flex flex-col flex-none gap-2'>
+          <label
+            htmlFor='password'
+            className='text-sm text-neutral-500 uppercase flex-none'
+          >
+            Password
+          </label>
+          <input
+            placeholder='Can be blank'
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete='false'
+            type='password'
+            id='password'
+            className='bg-neutral-950/50 rounded-md w-full px-3 py-2'
+          />
+        </div>
+        <button
+          type='submit'
+          className='bg-purple-800 hover:bg-purple-600 rounded-md px-3 py-2 mt-2'
+        >
+          Decrypt & copy to clipboard
+        </button>
+      </form>
+      {showResultModal && (
+        <div className='fixed inset-0 z-10 bg-black/80 flex flex-col items-center justify-center'>
+          <div className='overflow-x-hidden overflow-y-auto w-full p-5'>
+            <div className='flex flex-col mx-auto max-w-max'>
+              <div className='p-5 gap-3 flex flex-col bg-neutral-800 rounded-md'>
+                <p className='flex justify-between'>
+                  <span>
+                    {!hasError
+                      ? 'Data saved in clipboard!'
+                      : 'Something went wrong'}
+                  </span>
+                  <button
+                    type='button'
+                    onClick={() => {
+                      setShowResultModal(false)
+                      setHasError('')
+                    }}
+                  >
+                    <CloseIcon />
+                  </button>
+                </p>
+                <p className='bg-red-800/90 text-xs text-white p-3 rounded-md'>
+                  {hasError}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
