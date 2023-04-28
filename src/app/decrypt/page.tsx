@@ -68,7 +68,7 @@ export default function DecryptPage() {
 
     await navigator.clipboard.writeText(data!)
 
-    setHasError('')
+    setHasError(data!)
     setShowResultModal(true)
   }
 
@@ -157,7 +157,7 @@ export default function DecryptPage() {
           <div className='overflow-x-hidden overflow-y-auto w-full p-5'>
             <div className='flex flex-col mx-auto max-w-max'>
               <div className='p-5 gap-3 flex flex-col bg-neutral-800 rounded-md'>
-                <p className='flex justify-between'>
+                <p className='flex justify-between gap-5'>
                   <span>
                     {!hasError
                       ? 'Data saved in clipboard!'
