@@ -44,11 +44,14 @@ export default function DecryptPage() {
     let recovered: Uint8Array
     let data: string
 
+    setShowResultModal(true)
+
     try {
       // QR Codes
       shares = scans.map((s) => bs58.decode(s))
     } catch (e: any) {
       setHasError('QR Code: ' + e.message)
+      return
     }
 
     try {
@@ -56,6 +59,7 @@ export default function DecryptPage() {
       recovered = combine(shares!)
     } catch (e: any) {
       setHasError('SSS: ' + e.message)
+      return
     }
 
     try {
@@ -64,12 +68,12 @@ export default function DecryptPage() {
       data = await decrypt(salt, password, ciphertext)
     } catch (e: any) {
       setHasError('AES-GCM: ' + e.message)
+      return
     }
 
     await navigator.clipboard.writeText(data!)
 
     setHasError(data!)
-    setShowResultModal(true)
   }
 
   return (
