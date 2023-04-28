@@ -24,13 +24,29 @@ export default function RootLayout({
                 {children}
               </div>
             </div>
-            <div className='flex flex-col gap-3 mt-3 max-w-xs mx-auto text-neutral-500'>
-              <p className='text-center uppercase text-sm'>
+            <div className='flex flex-col gap-3 mt-3 max-w-xs mx-auto text-neutral-500 text-center'>
+              <p className='uppercase text-sm'>
                 <span className='font-bold '>Disclaimer</span>
               </p>
-              <p className='text-center uppercase text-xs'>
+              <p className='uppercase text-xs'>
                 By using this tool (website), you agree that the developer is
                 not responsible for any loss or damages that may happen to you
+              </p>
+              <p className='flex gap-5 underline mx-auto text-sm'>
+                <a
+                  href='https://twitter.com/vasamonte'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  Twitter
+                </a>
+                <a
+                  href='https://github.com/val-samonte/splitr'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  Github
+                </a>
               </p>
             </div>
           </div>
