@@ -159,5 +159,10 @@ export default function EncryptPage() {
 }
 
 function QrCodeWrapper({ code }: { code: string }) {
-  return <QRCodeCanvas size={300} includeMargin value={code} />
+  return (
+    <div className='flex flex-col'>
+      <QRCodeCanvas size={300} includeMargin value={code} />
+      <span className='text-xs'>{code}</span>
+    </div>
+  )
 }

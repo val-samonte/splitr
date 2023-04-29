@@ -50,7 +50,7 @@ export default function DecryptPage() {
       // QR Codes
       shares = scans.map((s) => bs58.decode(s))
     } catch (e: any) {
-      setHasError('QR Code: ' + e.message)
+      setHasError('QR Code: ' + e.message + ' ' + JSON.stringify(scans))
       return
     }
 
