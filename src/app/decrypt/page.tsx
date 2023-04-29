@@ -73,7 +73,7 @@ export default function DecryptPage() {
 
     await navigator.clipboard.writeText(data!)
 
-    setHasError(data!)
+    setHasError('')
   }
 
   return (
@@ -177,9 +177,11 @@ export default function DecryptPage() {
                     <CloseIcon />
                   </button>
                 </p>
-                <p className='bg-red-800/90 text-xs text-white p-3 rounded-md'>
-                  {hasError}
-                </p>
+                {hasError && (
+                  <p className='bg-red-800/90 text-xs text-white p-3 rounded-md'>
+                    {hasError}
+                  </p>
+                )}
               </div>
             </div>
           </div>
