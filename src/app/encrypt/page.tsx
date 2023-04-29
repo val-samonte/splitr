@@ -7,6 +7,7 @@ import HelpIcon from '../HelpIcon'
 import { encrypt } from '../crypto'
 import { QRCodeCanvas } from 'qrcode.react'
 import CloseIcon from '../CloseIcon'
+import classNames from 'classnames'
 
 export default function EncryptPage() {
   const [data, setData] = useState('')
@@ -39,16 +40,16 @@ export default function EncryptPage() {
         autoComplete='off'
       >
         <div className='flex flex-col flex-auto gap-2'>
-          <label
-            htmlFor='plaintext'
-            className='text-sm text-neutral-500 uppercase flex-none'
-          >
-            Plaintext data to encrypt
+          <label className='text-sm text-neutral-500 uppercase flex-none flex justify-between'>
+            <span>Plaintext data to encrypt</span>
+            <span className={classNames(data.length === 300 && 'text-red-500')}>
+              {data.length}/300
+            </span>
           </label>
           <textarea
             placeholder='Put text data to encrypt: account and passwords, private keys, seed phrases, diary, love letter, last will, etc.'
             value={data}
-            onChange={(e) => setData(e.target.value)}
+            onChange={(e) => setData(e.target.value.substring(0, 300))}
             autoFocus
             id='plaintext'
             className='bg-neutral-950/50 rounded-md w-full flex-auto h-full px-3 py-2'
