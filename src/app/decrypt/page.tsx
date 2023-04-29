@@ -50,7 +50,7 @@ export default function DecryptPage() {
       // QR Codes
       shares = scans.map((s) => bs58.decode(s))
     } catch (e: any) {
-      setHasError('QR Code: ' + e.message + ' ' + JSON.stringify(scans))
+      setHasError('QR Code: ' + e.message)
       return
     }
 
@@ -58,7 +58,7 @@ export default function DecryptPage() {
       // Shamir's Secret Sharing
       recovered = combine(shares!)
     } catch (e: any) {
-      setHasError('SSS: ' + e.message)
+      setHasError('SSS: ' + e.message + ' ' + JSON.stringify(scans))
       return
     }
 
