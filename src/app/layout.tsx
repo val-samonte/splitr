@@ -36,7 +36,7 @@ export default function RootLayout({
               </p>
               <p className='flex gap-5 underline mx-auto text-sm'>
                 <a
-                  href='https://twitter.com/vasamonte'
+                  href='https://twitter.com/vasamonte/status/1652254981859446787'
                   target='_blank'
                   rel='noopener noreferrer'
                 >

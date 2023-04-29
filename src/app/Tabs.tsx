@@ -15,7 +15,7 @@ export default function Tabs() {
           'flex-auto appearance-none rounded-t-xl px-5 py-3 text-center',
           path.includes('/encrypt')
             ? 'bg-neutral-800 text-white'
-            : 'bg-neutral-900 text-neutral-400',
+            : 'bg-neutral-900/50 text-neutral-400',
         )}
       >
         Encrypt
