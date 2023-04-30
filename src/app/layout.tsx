@@ -30,9 +30,9 @@ export default function RootLayout({
                 <span className='font-bold '>Disclaimer</span>
               </p>
               <p className='uppercase text-xs'>
-                By using this tool (website), you agree that the developer is
-                not responsible for any loss or damages that may occur to you.
-                Use at your own risk!
+                BY USING THIS TOOL (WEBSITE), YOU AGREE THAT THE DEVELOPER IS
+                NOT RESPONSIBLE FOR ANY LOSS OR DAMAGES THAT MAY OCCUR TO YOU.
+                USE AT YOUR OWN RISK!
               </p>
               <p className='flex gap-5 underline mx-auto text-sm'>
                 <a

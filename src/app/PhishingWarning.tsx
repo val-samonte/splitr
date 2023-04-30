@@ -19,44 +19,47 @@ export default function PhishingWarning() {
               <div className='p-5 gap-3 flex flex-col bg-neutral-800 rounded-md min-h-[50vh] text-sm'>
                 <p>
                   You will always encounter scams and bad actors. The best thing
-                  that you can do is to do your own research and be vigilant.
+                  that you can do is to conduct your own research and remain
+                  vigilant.
                 </p>
                 <p>
-                  As an extra precaution, before putting any sensitive
-                  information in this site, do the following steps:
+                  As an extra precaution, before entering any sensitive
+                  information into this site, please follow these steps:
                 </p>
-                <ul className='list-disc pl-5 flex-col flex gap-2'>
-                  <li>Go incognito / private browsing</li>
+                <ol className='list-disc pl-5 flex-col flex gap-2'>
+                  <li>Go incognito / private browsing.</li>
                   <li>
-                    Check the URL and make sure you visited the correct website
+                    Check the URL to ensure you have visited the correct
+                    website.
                   </li>
                   <li>
-                    Load the page that you will going to use (
+                    Load the page that you intend to use (
                     <span className='font-bold text-purple-400'>/encrypt</span>{' '}
                     or{' '}
-                    <span className='font-bold text-purple-400'>/decrypt</span>)
+                    <span className='font-bold text-purple-400'>/decrypt</span>
+                    ).
                   </li>
                   <li>
-                    Disconnect your internet access, this website
+                    Disconnect your internet access; this website
                     <br />
                     <span className='font-bold text-purple-400'>
                       SHOULD NOT
                     </span>{' '}
-                    call any external http requests nor store any local data in
-                    your browser
+                    call any external HTTP requests nor store any local data in
+                    your browser.
                   </li>
                   <li>
-                    Close the website when your done, better: exit the whole
-                    private browsing session
+                    Close the website when you are finished. It is better to
+                    exit the entire private browsing session.
                   </li>
-                </ul>
+                </ol>
                 <p className='text-center uppercase'>
                   <span className='font-bold text-purple-400'>Disclaimer</span>
                 </p>
                 <p className='text-center uppercase'>
-                  By using this tool (website), you agree that the developer is
-                  not responsible for any loss or damages that may occur to you.
-                  Use at your own risk!
+                  BY USING THIS TOOL (WEBSITE), YOU AGREE THAT THE DEVELOPER IS
+                  NOT RESPONSIBLE FOR ANY LOSS OR DAMAGES THAT MAY OCCUR TO YOU.
+                  USE AT YOUR OWN RISK!
                 </p>
                 <button
                   onClick={() => setShowModal(false)}
