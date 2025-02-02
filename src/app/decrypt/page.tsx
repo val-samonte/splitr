@@ -77,7 +77,16 @@ export default function DecryptPage() {
       // AES-GCM
       data = await decrypt(salt!, password, ciphertext!)
     } catch (e: any) {
-      setHasError('AES-GCM: ' + e.message)
+      setHasError(
+        'AES-GCM: ' +
+          e.message +
+          ' r: ' +
+          recovered +
+          ' s: ' +
+          salt +
+          ' c: ' +
+          ciphertext,
+      )
       return
     }
 
