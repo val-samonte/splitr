@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import QrScanner from 'qr-scanner'
 
 interface QRScannerProps {
@@ -12,6 +12,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null)
   const scannerRef = useRef<QrScanner | null>(null)
+  const [dd, setdd] = useState('')
 
   useEffect(() => {
     const startScanning = async () => {
@@ -42,6 +43,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({
         scannerRef.current = new QrScanner(
           videoRef.current,
           (result) => {
+            setdd(result.data)
             onQRCodeScanned(result.data)
           },
           {
@@ -73,6 +75,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({
 
   return (
     <div className='relative w-full max-w-md mx-auto'>
+      <div>{dd}</div>
       <div className='aspect-square bg-black rounded-lg overflow-hidden'>
         <video ref={videoRef} className='w-full h-full object-cover' />
       </div>
