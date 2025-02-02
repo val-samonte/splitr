@@ -1,11 +1,11 @@
 'use client'
 
 import { FormEvent, useCallback, useEffect, useState } from 'react'
-import { QrReader } from 'react-qr-reader'
 import bs58 from 'bs58'
 import { combine } from 'shamirs-secret-sharing-ts'
 import { decrypt } from '../crypto'
 import CloseIcon from '../CloseIcon'
+import { QRScanner } from '../QRScanner'
 
 export default function DecryptPage() {
   const [scans, setScans] = useState<string[]>([])
@@ -85,34 +85,28 @@ export default function DecryptPage() {
       >
         <div className='flex flex-col flex-none gap-2'>
           <label className='text-sm text-neutral-500 uppercase flex-none flex justify-between'>
-            <span>Scan {permission}</span>
-            <span>{scans.length} items scanned</span>
+            <span>Scan / Upload</span>
+            <span>{scans.length} items uploaded</span>
           </label>
-          <div className='relative' onClick={() => requestAccess()}>
-            <QrReader
-              videoContainerStyle={{ width: '100%' }}
-              videoStyle={{ width: '100%' }}
-              containerStyle={{ width: '100%' }}
-              className='w-full aspect-square bg-neutral-950/50 overflow-hidden rounded'
-              constraints={{ facingMode: 'environment' }}
-              onResult={async (result, error) => {
-                if (!!result) {
-                  const code = result?.getText()
+          <div className='relative'>
+            <QRScanner
+              onError={setErrorMsg}
+              onQRCodeScanned={(code) => {
+                setScans((codes) => {
+                  if (codes.includes(code)) return codes
+                  return [...codes, code]
+                })
 
-                  setScans((codes) => {
-                    if (codes.includes(code)) return codes
-                    return [...codes, code]
-                  })
-
-                  setErrorMsg('')
-                }
-
-                if (error?.message) {
-                  console.log(JSON.stringify(error))
-                  setErrorMsg(error.message)
-                }
+                setErrorMsg('')
               }}
             />
+            {scans.length === 0 && (
+              <div className='absolute inset-x-0 bottom-0 flex items-center justify-center p-3'>
+                <div className='px-3 py-2 mt-2 text-xs uppercase rounded-md'>
+                  You can also drag and drop QR codes here
+                </div>
+              </div>
+            )}
             {scans.length > 0 && (
               <div className='absolute inset-x-0 bottom-0 flex items-center justify-center p-3'>
                 <button
@@ -124,10 +118,18 @@ export default function DecryptPage() {
                 </button>
               </div>
             )}
-            {errorMsg && (
-              <div className='pointer-events-none absolute inset-x-2 bottom-2 bg-red-800/90 text-xs text-white p-3 rounded-md'>
-                {errorMsg}
-              </div>
+            {permission !== 'granted' && (
+              <button
+                onClick={() => requestAccess()}
+                type='button'
+                className={
+                  !errorMsg
+                    ? 'absolute inset-x-2 top-2 bg-yellow-400/90 text-xs text-black p-3 rounded-md'
+                    : 'absolute inset-x-2 top-2 text-center bg-red-800/90 text-xs text-white p-3 rounded-md'
+                }
+              >
+                {errorMsg || 'Tap here to allow camera access'}
+              </button>
             )}
           </div>
         </div>
