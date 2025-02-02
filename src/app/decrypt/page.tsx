@@ -81,11 +81,11 @@ export default function DecryptPage() {
         'AES-GCM: ' +
           e.message +
           ' r: ' +
-          recovered +
+          recovered! +
           ' s: ' +
-          salt +
+          salt! +
           ' c: ' +
-          ciphertext,
+          ciphertext!,
       )
       return
     }
