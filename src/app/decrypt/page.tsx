@@ -65,9 +65,9 @@ export default function DecryptPage() {
     }
 
     try {
-      const [_salt, _ciphertext] = recovered!.toString().split('.')
-      let salt = _salt
-      let ciphertext = _ciphertext
+      const [_salt, _ciphertext] = recovered.toString().split('.')
+      salt = _salt
+      ciphertext = _ciphertext
     } catch (e) {
       setHasError('SSS: QR Codes might be incomplete')
       return
@@ -75,18 +75,9 @@ export default function DecryptPage() {
 
     try {
       // AES-GCM
-      data = await decrypt(salt!, password, ciphertext!)
+      data = await decrypt(salt, password, ciphertext)
     } catch (e: any) {
-      setHasError(
-        'AES-GCM: ' +
-          e.message +
-          ' r: ' +
-          recovered! +
-          ' s: ' +
-          salt! +
-          ' c: ' +
-          ciphertext!,
-      )
+      setHasError('AES-GCM: ' + e.message)
       return
     }
 
