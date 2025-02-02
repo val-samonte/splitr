@@ -75,8 +75,7 @@ export default function DecryptPage() {
 
     try {
       // AES-GCM
-
-      data = await decrypt(salt, password, ciphertext)
+      data = await decrypt(salt!, password, ciphertext!)
     } catch (e: any) {
       setHasError('AES-GCM: ' + e.message)
       return

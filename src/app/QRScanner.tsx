@@ -11,7 +11,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({
   onError,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const codeReader = new BrowserQRCodeReader()
+  const codeReader = useRef(new BrowserQRCodeReader())
 
   useEffect(() => {
     const startScanning = async () => {
@@ -35,7 +35,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({
         const selectedDeviceId = selectedDevice.deviceId
 
         if (videoRef.current) {
-          await codeReader.decodeFromVideoDevice(
+          await codeReader.current.decodeFromVideoDevice(
             selectedDeviceId,
             videoRef.current,
             (result, error) => {
