@@ -64,10 +64,10 @@ export const QRScanner: React.FC<QRScannerProps> = ({
       </div>
       <div className='absolute inset-0 opacity-50 pointer-events-none'>
         <div className='absolute inset-0 border-4 border-transparent'>
-          <div className='absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-white rounded-tl-md'></div>
-          <div className='absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-white rounded-tr-md'></div>
-          <div className='absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-white rounded-bl-md'></div>
-          <div className='absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-white rounded-br-md'></div>
+          <div className='absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-white rounded-tl-md'></div>
+          <div className='absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-white rounded-tr-md'></div>
+          <div className='absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-white rounded-bl-md'></div>
+          <div className='absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-white rounded-br-md'></div>
         </div>
       </div>
     </div>

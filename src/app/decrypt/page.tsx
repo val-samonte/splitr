@@ -6,6 +6,7 @@ import { combine } from 'shamirs-secret-sharing-ts'
 import { decrypt } from '../crypto'
 import CloseIcon from '../CloseIcon'
 import { QRScanner } from '../QRScanner'
+import { QRDragAndDrop } from '../QRDragAndDrop'
 
 export default function DecryptPage() {
   const [scans, setScans] = useState<string[]>([])
@@ -103,18 +104,31 @@ export default function DecryptPage() {
             <span>{scans.length} codes parsed</span>
           </label>
           <div className='relative'>
-            <QRScanner
-              key={`scanner_${permission}`}
-              onError={setErrorMsg}
-              onQRCodeScanned={(code) => {
-                setScans((codes) => {
-                  if (codes.includes(code)) return codes
-                  return [...codes, code]
+            <QRDragAndDrop
+              onQRCodesDetected={(uploads) => {
+                uploads.forEach((file) => {
+                  if (file) {
+                    setScans((codes) => {
+                      if (codes.includes(file)) return codes
+                      return [...codes, file]
+                    })
+                  }
                 })
-
-                setErrorMsg('')
               }}
-            />
+            >
+              <QRScanner
+                key={`scanner_${permission}`}
+                onError={setErrorMsg}
+                onQRCodeScanned={(code) => {
+                  setScans((codes) => {
+                    if (codes.includes(code)) return codes
+                    return [...codes, code]
+                  })
+
+                  setErrorMsg('')
+                }}
+              />
+            </QRDragAndDrop>
             {scans.length === 0 && (
               <div className='absolute inset-x-0 bottom-0 flex items-center justify-center p-3'>
                 <div className='px-3 py-2 mt-2 text-xs uppercase rounded-md'>

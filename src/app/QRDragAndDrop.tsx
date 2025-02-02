@@ -1,7 +1,7 @@
 import React, { useState, useRef, DragEvent, ReactNode } from 'react'
 import { BrowserQRCodeReader } from '@zxing/browser'
 
-interface QRDragDropProps {
+interface QRDragAndDropProps {
   children: ReactNode
   onQRCodesDetected: (qrCodes: (string | null)[]) => void
   className?: string
@@ -25,7 +25,7 @@ const createCanvas = (img: HTMLImageElement): HTMLCanvasElement => {
   return canvas
 }
 
-const QRDragDrop: React.FC<QRDragDropProps> = ({
+export const QRDragAndDrop: React.FC<QRDragDropProps> = ({
   children,
   onQRCodesDetected,
   className = '',
@@ -95,8 +95,8 @@ const QRDragDrop: React.FC<QRDragDropProps> = ({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`relative cursor-pointer transition-all duration-200 ${
-        isDragging ? 'border-2 border-dashed border-white bg-gray-800/50' : ''
+      className={`relative rounded-lg cursor-pointer border-2 border-transparent duration-200 ${
+        isDragging ? 'border-dashed border-white/80 bg-gray-800/50' : ''
       } ${className}`}
     >
       <input
@@ -118,5 +118,3 @@ const QRDragDrop: React.FC<QRDragDropProps> = ({
     </div>
   )
 }
-
-export default QRDragDrop
