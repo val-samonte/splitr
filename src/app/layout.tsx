@@ -40,7 +40,7 @@ export default function RootLayout({
                   target='_blank'
                   rel='noopener noreferrer'
                 >
-                  Twitter
+                  X
                 </a>
                 <a
                   href='https://github.com/val-samonte/splitr'

@@ -1,11 +1,12 @@
 'use client'
 
 import { FormEvent, useCallback, useEffect, useState } from 'react'
-import { QrReader } from 'react-qr-reader'
 import bs58 from 'bs58'
 import { combine } from 'shamirs-secret-sharing-ts'
 import { decrypt } from '../crypto'
 import CloseIcon from '../CloseIcon'
+import { QRScanner } from '../QRScanner'
+import QRDragDrop from '../QRDragDrop'
 
 export default function DecryptPage() {
   const [scans, setScans] = useState<string[]>([])
@@ -43,12 +44,16 @@ export default function DecryptPage() {
     let shares: Uint8Array[]
     let recovered: Uint8Array
     let data: string
+    let salt: string
+    let ciphertext: string
 
     setShowResultModal(true)
 
     try {
       // QR Codes
-      shares = scans.map((s) => Buffer.from(bs58.decode(s)))
+      shares = scans.map((s) =>
+        Buffer.from(bs58.decode(s)),
+      ) as unknown as Uint8Array[]
     } catch (e: any) {
       setHasError('QR Code: ' + e.message)
       return
@@ -56,18 +61,31 @@ export default function DecryptPage() {
 
     try {
       // Shamir's Secret Sharing
-      recovered = combine(shares!)
+      recovered = combine(shares!) as unknown as Uint8Array
     } catch (e: any) {
       setHasError('SSS: ' + e.message)
       return
     }
 
     try {
+      const [_salt, _ciphertext] = recovered.toString().split('.')
+      salt = _salt
+      ciphertext = _ciphertext
+    } catch (e) {
+      setHasError('SSS: QR Codes might be incomplete')
+      return
+    }
+
+    try {
       // AES-GCM
-      const [salt, ciphertext] = recovered!.toString().split('.')
       data = await decrypt(salt, password, ciphertext)
     } catch (e: any) {
-      setHasError('AES-GCM: ' + e.message)
+      console.error(e)
+      if (e.message.includes('base58')) {
+        setHasError('Incomplete QR Codes')
+      } else {
+        setHasError('AES-GCM: ' + (e.message || 'Possible incorrect password'))
+      }
       return
     }
 
@@ -85,34 +103,42 @@ export default function DecryptPage() {
       >
         <div className='flex flex-col flex-none gap-2'>
           <label className='text-sm text-neutral-500 uppercase flex-none flex justify-between'>
-            <span>Scan {permission}</span>
-            <span>{scans.length} items scanned</span>
+            <span>Scan / Upload</span>
+            <span>{scans.length} codes parsed</span>
           </label>
-          <div className='relative' onClick={() => requestAccess()}>
-            <QrReader
-              videoContainerStyle={{ width: '100%' }}
-              videoStyle={{ width: '100%' }}
-              containerStyle={{ width: '100%' }}
-              className='w-full aspect-square bg-neutral-950/50 overflow-hidden rounded'
-              constraints={{ facingMode: 'environment' }}
-              onResult={async (result, error) => {
-                if (!!result) {
-                  const code = result?.getText()
-
+          <div className='relative'>
+            <QRDragDrop
+              onQRCodesDetected={(uploads) => {
+                uploads.forEach((file) => {
+                  if (file) {
+                    setScans((codes) => {
+                      if (codes.includes(file)) return codes
+                      return [...codes, file]
+                    })
+                  }
+                })
+              }}
+            >
+              <QRScanner
+                key={`scanner_${permission}`}
+                onError={setErrorMsg}
+                onQRCodeScanned={(code) => {
                   setScans((codes) => {
                     if (codes.includes(code)) return codes
                     return [...codes, code]
                   })
 
                   setErrorMsg('')
-                }
-
-                if (error?.message) {
-                  console.log(JSON.stringify(error))
-                  setErrorMsg(error.message)
-                }
-              }}
-            />
+                }}
+              />
+            </QRDragDrop>
+            {scans.length === 0 && (
+              <div className='absolute inset-x-0 bottom-0 flex items-center justify-center p-3'>
+                <div className='px-3 py-2 mt-2 text-xs uppercase rounded-md'>
+                  You can also drag and drop QR codes here
+                </div>
+              </div>
+            )}
             {scans.length > 0 && (
               <div className='absolute inset-x-0 bottom-0 flex items-center justify-center p-3'>
                 <button
@@ -124,10 +150,18 @@ export default function DecryptPage() {
                 </button>
               </div>
             )}
-            {errorMsg && (
-              <div className='pointer-events-none absolute inset-x-2 bottom-2 bg-red-800/90 text-xs text-white p-3 rounded-md'>
-                {errorMsg}
-              </div>
+            {permission !== 'granted' && (
+              <button
+                onClick={() => requestAccess()}
+                type='button'
+                className={
+                  !errorMsg
+                    ? 'absolute inset-x-3 top-3 bg-yellow-400/90 text-xs text-black p-3 rounded-sm'
+                    : 'absolute inset-x-3 top-3 text-center bg-red-800/90 text-xs text-white p-3 rounded-sm'
+                }
+              >
+                {errorMsg || 'Tap here to allow camera access.'}
+              </button>
             )}
           </div>
         </div>

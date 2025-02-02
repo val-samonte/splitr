@@ -27,7 +27,10 @@ export default function PhishingWarning() {
                   information into this site, please follow these steps:
                 </p>
                 <ol className='list-disc pl-5 flex-col flex gap-2'>
-                  <li>Go incognito / private browsing.</li>
+                  <li>
+                    Go incognito / private browsing. Make sure no extensions are
+                    enabled!
+                  </li>
                   <li>
                     Check the URL to ensure you have visited the correct
                     website.
