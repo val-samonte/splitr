@@ -1,38 +1,19 @@
 import React, { useState, useRef, DragEvent, ReactNode } from 'react'
-import { BrowserQRCodeReader } from '@zxing/browser'
+import QrScanner from 'qr-scanner'
 
-interface QRDragAndDropProps {
+interface QRDragDropProps {
   children: ReactNode
   onQRCodesDetected: (qrCodes: (string | null)[]) => void
   className?: string
 }
 
-const loadImage = (src: string): Promise<HTMLImageElement> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.onload = () => resolve(img)
-    img.onerror = reject
-    img.src = src
-  })
-}
-
-const createCanvas = (img: HTMLImageElement): HTMLCanvasElement => {
-  const canvas = document.createElement('canvas')
-  const context = canvas.getContext('2d')
-  canvas.width = img.width
-  canvas.height = img.height
-  context?.drawImage(img, 0, 0)
-  return canvas
-}
-
-export const QRDragAndDrop: React.FC<QRDragDropProps> = ({
+const QRDragDrop: React.FC<QRDragDropProps> = ({
   children,
   onQRCodesDetected,
   className = '',
 }) => {
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const reader = new BrowserQRCodeReader()
 
   const processFiles = async (files: FileList) => {
     const qrCodes: (string | null)[] = []
@@ -42,13 +23,10 @@ export const QRDragAndDrop: React.FC<QRDragDropProps> = ({
       if (!file.type.includes('png')) continue
 
       try {
-        const imageUrl = URL.createObjectURL(file)
-        const img = await loadImage(imageUrl)
-        const canvas = createCanvas(img)
-        const result = await reader.decodeFromCanvas(canvas)
-
-        qrCodes.push(result.getText())
-        URL.revokeObjectURL(imageUrl)
+        const result = await QrScanner.scanImage(file, {
+          returnDetailedScanResult: true,
+        })
+        qrCodes.push(result.data)
       } catch (error) {
         console.error('Error processing file:', error)
         qrCodes.push(null)
@@ -118,3 +96,5 @@ export const QRDragAndDrop: React.FC<QRDragDropProps> = ({
     </div>
   )
 }
+
+export default QRDragDrop

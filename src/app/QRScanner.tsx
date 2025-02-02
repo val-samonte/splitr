@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { BrowserQRCodeReader } from '@zxing/browser'
+import QrScanner from 'qr-scanner'
 
 interface QRScannerProps {
   onQRCodeScanned: (text: string) => void
@@ -11,50 +11,64 @@ export const QRScanner: React.FC<QRScannerProps> = ({
   onError,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const codeReader = useRef(new BrowserQRCodeReader())
+  const scannerRef = useRef<QrScanner | null>(null)
 
   useEffect(() => {
     const startScanning = async () => {
       try {
-        const videoInputDevices =
-          await BrowserQRCodeReader.listVideoInputDevices()
+        const cameras = await QrScanner.listCameras()
 
-        if (videoInputDevices.length === 0) {
+        if (cameras.length === 0) {
           onError('No camera devices found. Tap to retry.')
           return
         }
 
-        // Select the back camera if available, otherwise default to the first device
-        const selectedDevice =
-          videoInputDevices.find(
-            (device) =>
-              device.label.toLowerCase().includes('back') ||
-              device.label.toLowerCase().includes('rear'),
-          ) || videoInputDevices[0]
+        // Select the back camera if available, otherwise default to the first camera
+        const selectedCamera =
+          cameras.find(
+            (camera) =>
+              camera.label.toLowerCase().includes('back') ||
+              camera.label.toLowerCase().includes('rear'),
+          ) || cameras[0]
 
-        const selectedDeviceId = selectedDevice.deviceId
+        if (!videoRef.current) return
 
-        if (videoRef.current) {
-          await codeReader.current.decodeFromVideoDevice(
-            selectedDeviceId,
-            videoRef.current,
-            (result, error) => {
-              if (result) {
-                onQRCodeScanned(result.getText())
-              }
-              if (error) {
-                // Ignore errors as they occur frequently when no QR code is detected
-                return
-              }
-            },
-          )
+        // Stop any existing scanner
+        if (scannerRef.current) {
+          scannerRef.current.destroy()
         }
+
+        // Create new scanner
+        scannerRef.current = new QrScanner(
+          videoRef.current,
+          (result) => {
+            onQRCodeScanned(result.data)
+          },
+          {
+            preferredCamera: selectedCamera.id,
+            highlightScanRegion: false,
+            highlightCodeOutline: false,
+            returnDetailedScanResult: true,
+          },
+        )
+
+        await scannerRef.current.start()
       } catch (error) {
         console.error('Error accessing camera:', error)
+        onError(
+          'Failed to access camera. Please ensure camera permissions are granted.',
+        )
       }
     }
 
     startScanning()
+
+    // Cleanup function
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.destroy()
+      }
+    }
   }, [onQRCodeScanned, onError])
 
   return (

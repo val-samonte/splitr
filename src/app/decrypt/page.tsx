@@ -6,7 +6,7 @@ import { combine } from 'shamirs-secret-sharing-ts'
 import { decrypt } from '../crypto'
 import CloseIcon from '../CloseIcon'
 import { QRScanner } from '../QRScanner'
-import { QRDragAndDrop } from '../QRDragAndDrop'
+import QRDragDrop from '../QRDragDrop'
 
 export default function DecryptPage() {
   const [scans, setScans] = useState<string[]>([])
@@ -51,7 +51,9 @@ export default function DecryptPage() {
 
     try {
       // QR Codes
-      shares = scans.map((s) => Buffer.from(bs58.decode(s)))
+      shares = scans.map((s) =>
+        Buffer.from(bs58.decode(s)),
+      ) as unknown as Uint8Array[]
     } catch (e: any) {
       setHasError('QR Code: ' + e.message)
       return
@@ -59,7 +61,7 @@ export default function DecryptPage() {
 
     try {
       // Shamir's Secret Sharing
-      recovered = combine(shares!)
+      recovered = combine(shares!) as unknown as Uint8Array
     } catch (e: any) {
       setHasError('SSS: ' + e.message)
       return
@@ -78,10 +80,11 @@ export default function DecryptPage() {
       // AES-GCM
       data = await decrypt(salt, password, ciphertext)
     } catch (e: any) {
+      console.error(e)
       if (e.message.includes('base58')) {
         setHasError('Incomplete QR Codes')
       } else {
-        setHasError('AES-GCM: ' + e.message)
+        setHasError('AES-GCM: ' + (e.message || 'Possible incorrect password'))
       }
       return
     }
@@ -104,7 +107,7 @@ export default function DecryptPage() {
             <span>{scans.length} codes parsed</span>
           </label>
           <div className='relative'>
-            <QRDragAndDrop
+            <QRDragDrop
               onQRCodesDetected={(uploads) => {
                 uploads.forEach((file) => {
                   if (file) {
@@ -128,7 +131,7 @@ export default function DecryptPage() {
                   setErrorMsg('')
                 }}
               />
-            </QRDragAndDrop>
+            </QRDragDrop>
             {scans.length === 0 && (
               <div className='absolute inset-x-0 bottom-0 flex items-center justify-center p-3'>
                 <div className='px-3 py-2 mt-2 text-xs uppercase rounded-md'>
