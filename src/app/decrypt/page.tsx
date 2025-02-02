@@ -43,6 +43,8 @@ export default function DecryptPage() {
     let shares: Uint8Array[]
     let recovered: Uint8Array
     let data: string
+    let salt: string
+    let ciphertext: string
 
     setShowResultModal(true)
 
@@ -63,8 +65,17 @@ export default function DecryptPage() {
     }
 
     try {
+      const [_salt, _ciphertext] = recovered!.toString().split('.')
+      let salt = _salt
+      let ciphertext = _ciphertext
+    } catch (e) {
+      setHasError('SSS: QR Codes might be incomplete')
+      return
+    }
+
+    try {
       // AES-GCM
-      const [salt, ciphertext] = recovered!.toString().split('.')
+
       data = await decrypt(salt, password, ciphertext)
     } catch (e: any) {
       setHasError('AES-GCM: ' + e.message)
@@ -181,7 +192,7 @@ export default function DecryptPage() {
                 </p>
                 {hasError && (
                   <p className='bg-red-800/90 text-xs text-white p-3 rounded-md'>
-                    {hasError} {JSON.stringify(scans)}
+                    {hasError}
                   </p>
                 )}
               </div>
