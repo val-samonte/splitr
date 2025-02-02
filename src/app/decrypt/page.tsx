@@ -86,7 +86,7 @@ export default function DecryptPage() {
         <div className='flex flex-col flex-none gap-2'>
           <label className='text-sm text-neutral-500 uppercase flex-none flex justify-between'>
             <span>Scan / Upload</span>
-            <span>{scans.length} items uploaded</span>
+            <span>{scans.length} codes parsed</span>
           </label>
           <div className='relative'>
             <QRScanner
@@ -124,8 +124,8 @@ export default function DecryptPage() {
                 type='button'
                 className={
                   !errorMsg
-                    ? 'absolute inset-x-2 top-2 bg-yellow-400/90 text-xs text-black p-3 rounded-md'
-                    : 'absolute inset-x-2 top-2 text-center bg-red-800/90 text-xs text-white p-3 rounded-md'
+                    ? 'absolute inset-x-3 top-3 bg-yellow-400/90 text-xs text-black p-3 rounded-sm'
+                    : 'absolute inset-x-3 top-3 text-center bg-red-800/90 text-xs text-white p-3 rounded-sm'
                 }
               >
                 {errorMsg || 'Tap here to allow camera access'}
