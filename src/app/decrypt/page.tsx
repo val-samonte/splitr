@@ -77,7 +77,11 @@ export default function DecryptPage() {
       // AES-GCM
       data = await decrypt(salt, password, ciphertext)
     } catch (e: any) {
-      setHasError('AES-GCM: ' + e.message + ' s: ' + salt + ' c: ' + ciphertext)
+      if (e.message.includes('base58')) {
+        setHasError('Incomplete QR Codes')
+      } else {
+        setHasError('AES-GCM: ' + e.message)
+      }
       return
     }
 
@@ -100,6 +104,7 @@ export default function DecryptPage() {
           </label>
           <div className='relative'>
             <QRScanner
+              key={`scanner_${permission}`}
               onError={setErrorMsg}
               onQRCodeScanned={(code) => {
                 setScans((codes) => {
