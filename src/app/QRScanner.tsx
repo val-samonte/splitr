@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
-import QrScanner from 'qr-scanner'
+import React, { useEffect, useRef } from 'react'
+import { BrowserQRCodeReader } from '@zxing/browser'
 
 interface QRScannerProps {
   onQRCodeScanned: (text: string) => void
@@ -11,71 +11,54 @@ export const QRScanner: React.FC<QRScannerProps> = ({
   onError,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const scannerRef = useRef<QrScanner | null>(null)
-  const [dd, setdd] = useState('')
+  const codeReader = useRef(new BrowserQRCodeReader())
 
   useEffect(() => {
     const startScanning = async () => {
       try {
-        const cameras = await QrScanner.listCameras()
+        const videoInputDevices =
+          await BrowserQRCodeReader.listVideoInputDevices()
 
-        if (cameras.length === 0) {
+        if (videoInputDevices.length === 0) {
           onError('No camera devices found. Tap to retry.')
           return
         }
 
-        // Select the back camera if available, otherwise default to the first camera
-        const selectedCamera =
-          cameras.find(
-            (camera) =>
-              camera.label.toLowerCase().includes('back') ||
-              camera.label.toLowerCase().includes('rear'),
-          ) || cameras[0]
+        // Select the back camera if available, otherwise default to the first device
+        const selectedDevice =
+          videoInputDevices.find(
+            (device) =>
+              device.label.toLowerCase().includes('back') ||
+              device.label.toLowerCase().includes('rear'),
+          ) || videoInputDevices[0]
 
-        if (!videoRef.current) return
+        const selectedDeviceId = selectedDevice.deviceId
 
-        // Stop any existing scanner
-        if (scannerRef.current) {
-          scannerRef.current.destroy()
+        if (videoRef.current) {
+          await codeReader.current.decodeFromVideoDevice(
+            selectedDeviceId,
+            videoRef.current,
+            (result, error) => {
+              if (result) {
+                onQRCodeScanned(result.getText())
+              }
+              if (error) {
+                // Ignore errors as they occur frequently when no QR code is detected
+                return
+              }
+            },
+          )
         }
-
-        // Create new scanner
-        scannerRef.current = new QrScanner(
-          videoRef.current,
-          (result) => {
-            setdd(result.data)
-            onQRCodeScanned(result.data)
-          },
-          {
-            preferredCamera: selectedCamera.id,
-            highlightScanRegion: false,
-            highlightCodeOutline: false,
-            returnDetailedScanResult: true,
-          },
-        )
-
-        await scannerRef.current.start()
       } catch (error) {
         console.error('Error accessing camera:', error)
-        onError(
-          'Failed to access camera. Please ensure camera permissions are granted.',
-        )
       }
     }
 
     startScanning()
-
-    // Cleanup function
-    return () => {
-      if (scannerRef.current) {
-        scannerRef.current.destroy()
-      }
-    }
   }, [onQRCodeScanned, onError])
 
   return (
     <div className='relative w-full max-w-md mx-auto'>
-      <div>{dd}</div>
       <div className='aspect-square bg-black rounded-lg overflow-hidden'>
         <video ref={videoRef} className='w-full h-full object-cover' />
       </div>
