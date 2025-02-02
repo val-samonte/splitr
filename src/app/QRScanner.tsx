@@ -20,11 +20,19 @@ export const QRScanner: React.FC<QRScannerProps> = ({
           await BrowserQRCodeReader.listVideoInputDevices()
 
         if (videoInputDevices.length === 0) {
-          onError('No camera devices found')
+          onError('No camera devices found. Tap to retry.')
           return
         }
 
-        const selectedDeviceId = videoInputDevices[0].deviceId
+        // Select the back camera if available, otherwise default to the first device
+        const selectedDevice =
+          videoInputDevices.find(
+            (device) =>
+              device.label.toLowerCase().includes('back') ||
+              device.label.toLowerCase().includes('rear'),
+          ) || videoInputDevices[0]
+
+        const selectedDeviceId = selectedDevice.deviceId
 
         if (videoRef.current) {
           await codeReader.decodeFromVideoDevice(

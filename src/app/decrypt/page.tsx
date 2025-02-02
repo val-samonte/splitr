@@ -128,7 +128,7 @@ export default function DecryptPage() {
                     : 'absolute inset-x-3 top-3 text-center bg-red-800/90 text-xs text-white p-3 rounded-sm'
                 }
               >
-                {errorMsg || 'Tap here to allow camera access'}
+                {errorMsg || 'Tap here to allow camera access.'}
               </button>
             )}
           </div>
@@ -181,7 +181,7 @@ export default function DecryptPage() {
                 </p>
                 {hasError && (
                   <p className='bg-red-800/90 text-xs text-white p-3 rounded-md'>
-                    {hasError}
+                    {hasError} {JSON.stringify(scans)}
                   </p>
                 )}
               </div>
